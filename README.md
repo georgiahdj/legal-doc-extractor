@@ -79,6 +79,39 @@ Three prompting strategies are implemented in `prompts.py`:
 | chain_of_thought | 22.8s | 18 | 2/5 | 100% |
 | few_shot | 16.8s | 5 | 2/5 | 100% |
 
+### Local PDF Evaluation (1 page, moondream + chain_of_thought)
+
+* **Total time:** 136s (~2.2 minutes)
+* **Fields extracted:** 4 (Contract Number, Date, Notary Name, Notary Address)
+* **JSON Valid Rate:** 100% (Successfully normalized by error handler)
+* **Output File:** `extracted_data.json`
+
+#### UI Extraction & Logs Analysis
+
+Running the pipeline fully locally on CPU provided critical empirical logs regarding small-scale VLM behavior:
+
+* **Error Handler Interception:** The model failed to locate data for sellers, buyers, and properties on the target page. The terminal explicitly logged:  
+  `WARNING:error_handler:Validation warnings: ['Missing key: sellers', 'Missing key: buyers', 'Missing key: properties']`  
+  The system successfully recovered by embedding empty fallbacks (`[]`), keeping the Streamlit UI responsive and preventing JSON parsing crashes.
+* **Hardware Latency:** A single page required **2m 16s**, confirming that local CPU inference is a massive bottleneck for scanning heavy legal files.
+* **Greek OCR/Reasoning Limits:** The 1.6B model generated character hallucinations on dense Greek strings (e.g., Notary Address: `ΑΡΙΜΟΥΙΣΠΕΔΡΑΣΤΟΥ ΓΣΛΑΣΚΗΣΙΑ`), validating why the **Qwen2.5-VL via GPU** strategy remains the primary choice for production readiness.
+
+#### Raw Extracted JSON Output
+```json
+{
+  "contract_number": "86",
+  "contract_date": "19.924",
+  "notary": {
+    "name": "Συνάθητο",
+    "address": "ΑΡΙΜΟΥΙΣΠΕΔΡΑΣΤΟΥ ΓΣΛΑΣΚΗΣΙΑ"
+  },
+  "sellers": [],
+  "buyers": [],
+  "representatives": [],
+  "properties": []
+}
+
+
 **Conclusions:**
 - **chain_of_thought** = best accuracy (most fields, best GT score)
 - **few_shot** = fastest but misses fields in later pages
