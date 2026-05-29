@@ -133,12 +133,12 @@ The document type is auto-detected from OCR text and a type-specific prompt is u
 
 | Bottleneck | Solution | Status |
 |-----------|----------|--------|
-| CPU inference is slow | GPU inference via Google Colab T4 | ✅ Implemented (`colab_inference.ipynb`) |
-| Full document takes too long | Page slider in UI to limit pages processed | ✅ Implemented (sidebar slider 1-23 pages) |
-| Large model won't fit in RAM | Quantized models (Q4_K_M) via Ollama | ✅ Applied (qwen2.5vl:3b = 3.2GB) |
-| VLM context window limits | Text chunking in preprocessor | ✅ Implemented (`split_into_chunks()`) |
-| Repeated extraction on same doc | Results saved to JSON (no re-inference needed) | ✅ Implemented (`save_results()`) |
-| Batch/parallel processing | Sequential inference to avoid OOM on low RAM | ✅ Implemented with `gc.collect()` per page |
+| CPU inference is slow | GPU inference via Google Colab T4 | Implemented (`colab_inference.ipynb`) |
+| Full document takes too long | Page slider in UI to limit pages processed | Implemented (sidebar slider 1-23 pages) |
+| Large model won't fit in RAM | Quantized models (Q4_K_M) via Ollama | Applied (qwen2.5vl:3b = 3.2GB) |
+| VLM context window limits | Text chunking in preprocessor | Implemented (`split_into_chunks()`) |
+| Repeated extraction on same doc | Results saved to JSON (no re-inference needed) | Implemented (`save_results()`) |
+| Batch/parallel processing | Sequential inference to avoid OOM on low RAM | Implemented with `gc.collect()` per page |
 
 ---
 
