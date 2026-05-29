@@ -93,12 +93,11 @@ Tested fully locally inside the core Docker container (1 page per strategy) to b
 
 <img width="571" height="525" alt="αρχείο λήψης (1)" src="https://github.com/user-attachments/assets/ae3dab95-559c-4fae-bb17-3d1730657c74" />
 
-[2026-05-29T21-03_export.csv](https://github.com/user-attachments/files/28409650/2026-05-29T21-03_export.csv)
-,Prompt,Avg Time (s),Fields Found,GT Score (0-5),JSON Valid Rate,Error Rate,Sellers,Buyers,Properties
-0,zero_shot,110.25,4,0,1,0,0,0,0
-1,chain_of_thought,114.16,4,0,1,0,0,0,0
-2,few_shot,319.6,4,1,0.33,0.67,0,0,0
-
+| Prompt | Avg Time (s) | Fields Found | GT Score (0-5) | JSON Valid Rate | Error Rate | Sellers | Buyers | Properties |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **zero_shot** | 110.25 | 4 | 0 | 1.00 | 0.00 | 0 | 0 | 0 |
+| **chain_of_thought** | 114.16 | 4 | 0 | 1.00 | 0.00 | 0 | 0 | 0 |
+| **few_shot** | 319.60 | 4 | 1 | 0.33 | 0.67 | 0 | 0 | 0 |
 
 
 #### Local Architectural Conclusions & Logs Analysis
