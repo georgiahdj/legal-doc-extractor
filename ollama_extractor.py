@@ -93,3 +93,12 @@ def warmup_model():
         return True
     except:
         return False
+
+
+def safe_extract_from_page(image_bytes: bytes, prompt: str) -> dict:
+    """
+    Safe wrapper για extract_from_page με error handling.
+    """
+    from error_handler import safe_extract, fix_result
+    result = safe_extract(extract_from_page, image_bytes, prompt)
+    return fix_result(result)
