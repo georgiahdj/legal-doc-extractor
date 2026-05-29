@@ -111,7 +111,7 @@ Running the pipeline fully locally on CPU provided critical empirical logs regar
   "representatives": [],
   "properties": []
 }
-
+```
 
 **Conclusions:**
 - **chain_of_thought** = best accuracy (most fields, best GT score)
