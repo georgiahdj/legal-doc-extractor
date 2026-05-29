@@ -5,7 +5,7 @@ import os
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_URL = f"{OLLAMA_HOST}/api/generate"
-MODEL = "llava"
+MODEL = "qwen2.5vl:3b"
 
 
 def warmup_model():
