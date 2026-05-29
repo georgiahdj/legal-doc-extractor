@@ -3,7 +3,7 @@ import json
 import time
 import pandas as pd
 from extractor import pdf_to_images, save_results
-from ollama_extractor import extract_from_pdf, check_ollama_connection
+from ollama_extractor import safe_extract_from_page, check_ollama_connection
 from evaluator import run_full_evaluation, format_evaluation_for_display
 from prompts import PROMPTS
 
@@ -24,13 +24,21 @@ with st.sidebar:
         help="Advanced: Select the prompting strategy for the VLM"
     )
 
+    max_pages = st.slider(
+        "Max pages to process:",
+        min_value=1,
+        max_value=23,
+        value=3,
+        help="Limit pages for faster processing. Recommended: 3-5 pages."
+    )
+
     st.markdown("---")
     st.subheader("ℹ️ About")
     st.markdown("""
     This tool extracts structured data from Greek property deeds using a
     Vision Language Model (VLM) running locally via Ollama.
     
-    **Model:** Qwen2.5-VL 3B  
+    **Model:** Configurable (default: Moondream)  
     **Powered by:** Ollama + Streamlit  
     **Assessment for:** Synthetica AI
     """)
@@ -47,7 +55,7 @@ with tab1:
     if not ollama_ok:
         st.warning("⚠️ Ollama is starting up, please wait...")
     else:
-        st.success("✅ Ollama is running and ready! (qwen2.5vl:3b)")
+        st.success("✅ Ollama is running and ready!")
 
     st.markdown("### Upload your document")
 
@@ -74,32 +82,19 @@ with tab1:
                 f.write(pdf_bytes)
 
             images = pdf_to_images("temp.pdf")
-            total_pages = len(images)
             images = images[:max_pages]
             total_pages = len(images)
 
-            status.text(f"📄 Found {total_pages} pages")
+            status.text(f"📄 Processing {total_pages} pages...")
             progress.progress(20)
-
-            status.text("🤖 Extracting data with VLM...")
-
-            max_pages = st.slider(
-                "Max pages to process:",
-                min_value=1,
-                max_value=23,
-                value=3,
-                help="Limit pages for faster processing"
-            )
 
             selected_prompt = PROMPTS[prompt_choice]
 
             from extractor import merge_results
-            from ollama_extractor import extract_from_page
 
             page_results = []
             for i, image_bytes in enumerate(images):
                 status.text(f"🤖 Processing page {i+1}/{total_pages}...")
-                from ollama_extractor import safe_extract_from_page
                 result = safe_extract_from_page(image_bytes, selected_prompt)
                 page_results.append(result)
 
@@ -186,11 +181,7 @@ with tab1:
 
             st.download_button(
                 label="📥 Download JSON",
-                data=json.dumps(
-                    final_result,
-                    ensure_ascii=False,
-                    indent=2
-                ),
+                data=json.dumps(final_result, ensure_ascii=False, indent=2),
                 file_name="extracted_data.json",
                 mime="application/json"
             )
@@ -201,7 +192,9 @@ with tab2:
     This tab compares the 3 prompt strategies on the first 3 pages
     of your document. It measures:
     - **Speed**: average time per page
-    - **Accuracy proxy**: number of fields successfully extracted
+    - **Accuracy**: Ground Truth score + fields extracted
+    - **JSON validity rate**: how often the model returns valid JSON
+    - **Error rate**: how often extraction fails
     """)
 
     eval_file = st.file_uploader(
@@ -232,23 +225,19 @@ with tab2:
 
             with col1:
                 st.markdown("**Speed (lower is better)**")
-                speed_data = {
-                    r["prompt_name"]: r["avg_time_per_page"]
-                    for r in results
-                }
+                speed_data = {r["prompt_name"]: r["avg_time_per_page"] for r in results}
                 st.bar_chart(speed_data)
 
             with col2:
                 st.markdown("**Fields Extracted (higher is better)**")
-                accuracy_data = {
-                    r["prompt_name"]: r["fields_extracted"]["total_filled"]
-                    for r in results
-                }
+                accuracy_data = {r["prompt_name"]: r["fields_extracted"]["total_filled"] for r in results}
                 st.bar_chart(accuracy_data)
 
-            best = max(results, key=lambda x: x["fields_extracted"]["total_filled"])
+            best = max(results, key=lambda x: x["ground_truth_score"])
             fastest = min(results, key=lambda x: x["avg_time_per_page"])
+            most_fields = max(results, key=lambda x: x["fields_extracted"]["total_filled"])
 
             st.markdown("### 🏆 Conclusions")
-            st.success(f"Best accuracy: **{best['prompt_name']}** ({best['fields_extracted']['total_filled']} fields)")
+            st.success(f"Best accuracy: **{best['prompt_name']}** (GT score: {best['ground_truth_score']}/5)")
             st.info(f"Fastest: **{fastest['prompt_name']}** ({fastest['avg_time_per_page']}s/page)")
+            st.info(f"Most fields: **{most_fields['prompt_name']}** ({most_fields['fields_extracted']['total_filled']} fields)")
