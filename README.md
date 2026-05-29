@@ -83,12 +83,6 @@ Three prompting strategies are implemented in `prompts.py`:
 
 Tested fully locally inside the core Docker container (1 page per strategy) to benchmark localized performance and architectural constraints on restricted environments:
 
-| Strategy | Avg Time/Page | Fields Found | GT Score (0-5) | JSON Valid Rate | Error Rate |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **zero_shot** | 110.25s | 4 | 0/5 | 100% | 0% |
-| **chain_of_thought** | 114.16s | 4 | 0/5 | 100% | 0% |
-| **few_shot** | 319.60s | 4 | 1/5 | 33% | 67% |
-
 <img width="571" height="525" alt="αρχείο λήψης" src="https://github.com/user-attachments/assets/1a4365d2-65d8-48a2-876d-47875dfd3292" />
 
 <img width="571" height="525" alt="αρχείο λήψης (1)" src="https://github.com/user-attachments/assets/ae3dab95-559c-4fae-bb17-3d1730657c74" />
