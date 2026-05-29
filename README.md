@@ -71,13 +71,27 @@ Three prompting strategies are implemented in `prompts.py`:
 | chain_of_thought | Step-by-step reasoning before extraction | Accuracy |
 | few_shot | Includes example input/output | Balanced |
 
-### Evaluation Results (qwen2.5vl:3b, Colab T4 GPU, 3 pages)
+### 1. Cloud GPU Evaluation (qwen2.5vl:3b, Colab T4 GPU, 3 pages)
 
 | Prompt | Avg Time/Page | Fields Found | GT Score (0-5) | JSON Valid Rate |
 |--------|--------------|--------------|----------------|-----------------|
 | zero_shot | 22.1s | 14 | 1/5 | 100% |
 | chain_of_thought | 22.8s | 18 | 2/5 | 100% |
 | few_shot | 16.8s | 5 | 2/5 | 100% |
+
+**Conclusions:**
+- **chain_of_thought** = best accuracy (most fields, best GT score)
+- **few_shot** = fastest but misses fields in later pages
+- **zero_shot** = consistent but lower accuracy
+
+### Full PDF Evaluation (23 pages, chain_of_thought + error handler)
+
+- Total time: 527s (~8.8 minutes)
+- Fields extracted: 42
+- GT Score: 3/5
+- Error rate: ~13% (retry mechanism handled all failures)
+
+---
 
 ### 2. Local CPU Evaluation (moondream benchmark across all strategies)
 
@@ -118,20 +132,6 @@ Tested fully locally inside the core Docker container (1 page per strategy) to b
   "properties": []
 }
 ```
-
-**Conclusions:**
-- **chain_of_thought** = best accuracy (most fields, best GT score)
-- **few_shot** = fastest but misses fields in later pages
-- **zero_shot** = consistent but lower accuracy
-
-### Full PDF Evaluation (23 pages, chain_of_thought + error handler)
-
-- Total time: 527s (~8.8 minutes)
-- Fields extracted: 42
-- GT Score: 3/5
-- Error rate: ~13% (retry mechanism handled all failures)
-
----
 
 ## Error Handling
 
