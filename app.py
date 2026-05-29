@@ -60,9 +60,11 @@ with tab1:
 
     ollama_ok = check_ollama_connection()
     if not ollama_ok:
-        st.warning("⚠️ Ollama is starting up, please wait...")
+        st.warning("⚠️ VLM backend not reachable. Check OLLAMA_HOST settings.")
     else:
-        st.success("✅ Ollama is running and ready!")
+        import os
+        model_name = os.environ.get('VLM_MODEL', 'moondream')
+        st.success("✅ VLM backend ready! (Model: {model_name})")
 
     st.markdown("### Upload your document")
 
