@@ -64,7 +64,7 @@ with tab1:
     else:
         import os
         model_name = os.environ.get('VLM_MODEL', 'moondream')
-        st.success("✅ VLM backend ready! (Model: {model_name})")
+        st.success(f"✅ VLM backend ready! (Model: {model_name})")
 
     st.markdown("### Upload your document")
 
