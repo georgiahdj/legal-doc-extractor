@@ -25,8 +25,8 @@ services:
     entrypoint: >
       /bin/sh -c "
         sleep 5 &&
-        ollama pull moondream &&
-        ollama run moondream 'hi'
+        ollama pull qwen2.5vl:3b &&
+        echo 'Model ready!'
       "
     restart: "no"
 
