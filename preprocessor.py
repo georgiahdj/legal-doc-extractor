@@ -75,13 +75,7 @@ def adaptive_threshold(img: Image.Image) -> Image.Image:
 
 def sharpen(img: Image.Image) -> Image.Image:
     """Sharpening — τα scans είναι συχνά blurry."""
-    kernel = ImageFilter.Kernel(
-        size=3,
-        kernel=[0, -1, 0, -1, 5, -1, 0, -1, 0],
-        scale=1,
-        offset=0
-    )
-    return img.filter(kernel)
+    return img.filter(ImageFilter.SHARPEN)
 
 
 def enhance_contrast(img: Image.Image) -> Image.Image:
