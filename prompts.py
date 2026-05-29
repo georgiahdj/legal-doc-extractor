@@ -1,33 +1,16 @@
-#### prompts.py
-### 3 στρατηγικες προμπτ: zero shot, few shot, chain of thought
-### 3 διαφορετικα προμπτ για καθε στρατηγικη
-
+# prompts.py
+# 3 prompt strategies: zero_shot, few_shot, chain_of_thought
+# All in English for better VLM understanding
 
 # ============================================================
 # PROMPT 1 — Zero-shot
-# prompt χωρίς παραδείγματα
+# Direct extraction without examples
 # ============================================================
-ZERO_SHOT_PROMPT = """
-This is a page from a Greek property deed (συμβόλαιο αγοραπωλησίας).
+ZERO_SHOT_PROMPT = """You are a legal document extraction system for Greek property deeds.
 
-Look carefully at the text and extract ANY of the following you can find:
+Extract the following fields from the text below. Return ONLY a JSON object, no explanation.
 
-- Contract number (look for "ΑΡΙΘΜΟΣ" or a number near the top)
-- Date (look for a date in the text)
-- Notary name (look for "ΣΥΜΒΟΛΑΙΟΓΡΑΦΟΣ" or "Συμβολαιογράφο")
-- Notary address
-- Seller name (look for "πωλητ" or "αφ' ενός")
-- Seller AFM (look for "ΑΦΜ" followed by numbers)
-- Buyer name (look for "αγοραστ" or "αφ' ετέρου")  
-- Buyer AFM
-- Property type (look for "οικόπεδο", "κατάστημα", "διαμέρισμα")
-- Property location
-- Property area (look for "τετραγωνικών μέτρων" or "τ.μ.")
-- KAEK number
-
-Return a JSON object. Use null for anything not found on this page.
-Do not include markdown, just the raw JSON.
-
+JSON structure:
 {
   "contract_number": null,
   "contract_date": null,
@@ -37,34 +20,54 @@ Do not include markdown, just the raw JSON.
   "representatives": [{"name": null, "represents": null, "id_document": null}],
   "properties": [{"type": null, "location": null, "municipality": null, "block": null, "area_sqm": null, "floor": null, "kaek": null, "building_permit": null}]
 }
-"""
+
+Field hints:
+- contract_number: look for "ΑΡΙΘΜΟΣ" followed by digits
+- contract_date: look for a date in the text
+- notary name: look for "ΣΥΜΒΟΛΑΙΟΓΡΑΦΟΣ" or "Συμβολαιογράφο"
+- seller: look for "πωλητ" or "αφ' ενός" — may be a company (Α.Ε., Τράπεζα)
+- buyer: look for "αγοραστ" or "αφ' ετέρου"
+- AFM (tax number): look for "ΑΦΜ" followed by digits
+- property type: look for "οικόπεδο", "κατάστημα", "διαμέρισμα", "κτίσμα"
+- area: look for "τετραγωνικών μέτρων" or "τ.μ." followed by number
+- KAEK: look for "ΚΑΕΚ" followed by digits
+
+Use null for any field not found. Return ONLY valid JSON."""
+
 
 # ============================================================
 # PROMPT 2 — Chain of Thought
-# το μοντέλο σκεφτεται βήμα βήμα
+# Step-by-step reasoning
 # ============================================================
-COT_PROMPT = """
-You are a legal document analysis system specialized in Greek property deeds.
+COT_PROMPT = """You are a legal document extraction system for Greek property deeds.
 
-Think step by step before extracting information:
+Think step by step:
 
-Step 1: Is this the first page? Look for contract number and notary details.
-Step 2: Are there party descriptions? Look for seller (πωλητής/πωλήτρια) and buyer (αγοραστής/αγοράστρια).
-Step 3: Are there property descriptions? Look for οικόπεδο, κτίσμα, ΚΑΕΚ.
-Step 4: Are there representative details? Look for πληρεξούσιος, αντιπρόσωπος.
-Step 5: Extract all found information into JSON.
+Step 1: Find contract metadata
+- Look for "ΑΡΙΘΜΟΣ" → contract number
+- Look for date (day/month/year) → contract date
 
-Extract from this page of a Greek property deed:
-- Contract number and date
-- Notary: name, address
-- Sellers: name, AFM, address, ID document
-- Buyers: name, AFM, address, ID document  
-- Representatives: name, who they represent, ID document
-- Properties: type, location, municipality, block, area, floor, KAEK, building permit
+Step 2: Find the notary
+- Look for "ΣΥΜΒΟΛΑΙΟΓΡΑΦΟΣ" or "Συμβολαιογράφο" → notary name
+- Look for address near notary name → notary address
 
-Return ONLY valid JSON, no text before or after.
-Use null for fields not found on this page.
+Step 3: Find sellers (πωλητές)
+- Look for "αφ' ενός", "πωλητ", "πωλήτρια τράπεζα"
+- For each seller: extract name, AFM (digits after "ΑΦΜ"), address, ID document
 
+Step 4: Find buyers (αγοραστές)
+- Look for "αφ' ετέρου", "αγοραστ"
+- For each buyer: extract name, AFM, address, ID document
+
+Step 5: Find representatives
+- Look for "πληρεξούσιος", "αντιπρόσωπος", "νόμιμος εκπρόσωπος"
+- Extract who they represent
+
+Step 6: Find property details
+- Look for "οικόπεδο", "κτίσμα", "κατάστημα", "διαμέρισμα"
+- Extract: location, municipality, area in sqm, floor, KAEK, building permit
+
+After reasoning, return ONLY this JSON (no other text):
 {
   "contract_number": null,
   "contract_date": null,
@@ -73,21 +76,19 @@ Use null for fields not found on this page.
   "buyers": [{"name": null, "afm": null, "address": null, "id_document": null}],
   "representatives": [{"name": null, "represents": null, "id_document": null}],
   "properties": [{"type": null, "location": null, "municipality": null, "block": null, "area_sqm": null, "floor": null, "kaek": null, "building_permit": null}]
-}
-"""
+}"""
+
 
 # ============================================================
 # PROMPT 3 — Few-shot
-#  examples για να καταλάβει το μοντέλο
+# With examples for better understanding
 # ============================================================
-FEW_SHOT_PROMPT = """
-You are a legal document analysis system specialized in Greek property deeds.
+FEW_SHOT_PROMPT = """You are a legal document extraction system for Greek property deeds.
 
 Here is an example of correct extraction:
 
-Example input text: 
-"Αριθμός 11.924. Στην Αθήνα σήμερα στις 29 Δεκεμβρίου 1999, στο συμβολαιογραφείο μου, 
-εγώ η Συμβολαιογράφος ΜΑΡΙΑ ΜΑΣΟΥΡΟΥ-ΤΣΑΝΑΚΑ, οδός Δημοκρίτου 4."
+Example input:
+"ΑΡΙΘΜΟΣ 11.924. Στην Αθήνα σήμερα στις είκοσι εννέα (29) Δεκεμβρίου 1999, στο συμβολαιογραφείο μου που βρίσκεται στην οδό Δημοκρίτου αρ.4, εγώ η Συμβολαιογράφος ΜΑΡΙΑ ΜΑΣΟΥΡΟΥ-ΤΣΑΝΑΚΑ. Ι.- (αφ' ενός): Αθανάσιος Αλμπάνης, ΑΦΜ 94325270, κάτοικος Αγίας Παρασκευής, οδός Αρτέμιδος 18, ΑΔΤ Ν 245733/1984."
 
 Example output:
 {
@@ -97,15 +98,20 @@ Example output:
     "name": "Μαρία Μασούρου-Τσανάκα",
     "address": "Δημοκρίτου 4, Αθήνα"
   },
-  "sellers": [],
+  "sellers": [
+    {
+      "name": "Αθανάσιος Αλμπάνης",
+      "afm": "94325270",
+      "address": "Αγίας Παρασκευής, Αρτέμιδος 18",
+      "id_document": "ΑΔΤ Ν 245733/1984"
+    }
+  ],
   "buyers": [],
   "representatives": [],
   "properties": []
 }
 
-Now extract from the provided page. Return ONLY valid JSON, no text before or after.
-Use null for missing fields, empty list [] if no items found.
-
+Now extract from the text below. Return ONLY valid JSON, no explanation:
 {
   "contract_number": null,
   "contract_date": null,
@@ -114,8 +120,8 @@ Use null for missing fields, empty list [] if no items found.
   "buyers": [{"name": null, "afm": null, "address": null, "id_document": null}],
   "representatives": [{"name": null, "represents": null, "id_document": null}],
   "properties": [{"type": null, "location": null, "municipality": null, "block": null, "area_sqm": null, "floor": null, "kaek": null, "building_permit": null}]
-}
-"""
+}"""
+
 
 # Dictionary για εύκολη πρόσβαση
 PROMPTS = {
