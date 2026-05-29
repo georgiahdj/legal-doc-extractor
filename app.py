@@ -17,6 +17,13 @@ with st.sidebar:
     st.title("⚙️ Advanced Settings")
     st.markdown("---")
 
+    model_choice = st.selectbox(
+        "Select VLM Model:",
+        options=["moondream", "qwen2.5vl:3b", "llava"],
+        index=0,
+        help="moondream: runs locally (slow, CPU). qwen2.5vl:3b: requires Colab GPU (fast, accurate). llava: requires GPU."
+    )
+
     prompt_choice = st.selectbox(
         "Select extraction strategy:",
         options=["chain_of_thought", "zero_shot", "few_shot"],
@@ -97,6 +104,10 @@ with tab1:
             progress.progress(20)
 
             selected_prompt = get_prompt_for_document_type(doc_type, prompt_choice)
+
+            # Set model from UI selection
+            import ollama_extractor
+            ollama_extractor.MODEL = model_choice
 
             from extractor import merge_results
 
