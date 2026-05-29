@@ -102,7 +102,7 @@ We executed **3 distinct validation experiments** on the cloud GPU infrastructur
   - **Pipeline Recovery Rate:** ~13% error intervention (The retry mechanism caught and repaired 3 initially malformed layouts mid-run).
 
  
-### 2. Local CPU Evaluation (moondream benchmark across all strategies)
+### 2. Local CPU Evaluation (moondream benchmark across 1 page)
 
 Tested fully locally inside the core Docker container (1 page per strategy) to benchmark localized performance and architectural constraints on restricted environments:
 
