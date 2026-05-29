@@ -100,8 +100,8 @@ We executed **3 distinct validation experiments** on the cloud GPU infrastructur
   - **Total Data Objects Captured:** 42 dense legal attributes
   - **Aggregated Output Tree:** 9 Sellers, 9 Buyers, 8 Representatives, and 12 distinct Property segments merged seamlessly into a single JSON schema.
   - **Pipeline Recovery Rate:** ~13% error intervention (The retry mechanism caught and repaired 3 initially malformed layouts mid-run).
+
  
-  - 
 ### 2. Local CPU Evaluation (moondream benchmark across all strategies)
 
 Tested fully locally inside the core Docker container (1 page per strategy) to benchmark localized performance and architectural constraints on restricted environments:
