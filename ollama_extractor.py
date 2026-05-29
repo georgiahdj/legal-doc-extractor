@@ -39,16 +39,19 @@ def extract_from_text(text: str, prompt: str) -> dict:
         response = requests.post(OLLAMA_URL, json=payload, timeout=600)
         raw_text = response.json()["response"].strip()
 
-        if "```json" in raw_text:
-            raw_text = raw_text.split("```json")[1].split("```")[0].strip()
-        elif "```" in raw_text:
-            raw_text = raw_text.split("```")[1].split("```")[0].strip()
+        import re
+        raw_text = re.sub(r'```json\s*', '', raw_text)
+        raw_text = re.sub(r'```\s*', '', raw_text)
+        raw_text = raw_text.strip()
+
 
         # Try to find JSON in response
         start = raw_text.find('{')
         end = raw_text.rfind('}') + 1
         if start >= 0 and end > start:
             raw_text = raw_text[start:end]
+
+        print("RAW:", raw_text[:300])
 
         return json.loads(raw_text)
 
