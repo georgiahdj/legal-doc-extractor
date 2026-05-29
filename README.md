@@ -86,6 +86,7 @@ Three prompting strategies are implemented in `prompts.py`:
 * **JSON Valid Rate:** 100% (Successfully normalized by error handler)
 * **Output File:** `extracted_data.json`
 
+
 #### UI Extraction & Logs Analysis
 
 Running the pipeline fully locally on CPU provided critical empirical logs regarding small-scale VLM behavior:
