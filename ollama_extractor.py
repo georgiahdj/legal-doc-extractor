@@ -1,5 +1,7 @@
 import requests
+import base64
 import json
+import re
 import time
 import os
 
@@ -8,26 +10,11 @@ OLLAMA_URL = f"{OLLAMA_HOST}/api/generate"
 MODEL = "qwen2.5vl:3b"
 
 
-def warmup_model():
-    """
-    Φορτώνει το μοντέλο στη μνήμη με ένα απλό request.
-    Πρέπει να τρέχει πριν από τα extractions.
-    """
-    try:
-        print("Φόρτωση moondream...")
-        payload = {"model": MODEL, "prompt": "hi", "stream": False}
-        requests.post(OLLAMA_URL, json=payload, timeout=120)
-        print("Moondream έτοιμο!")
-        return True
-    except:
-        return False
-
-
 def extract_from_text(text: str, prompt: str) -> dict:
     """
-    Στέλνει κείμενο στο moondream και παίρνει JSON.
+    Στέλνει OCR κείμενο στο VLM και παίρνει JSON.
     """
-    full_prompt = f"{prompt}\n\nText from document:\n{text}\n\nReturn ONLY valid JSON, nothing else."
+    full_prompt = f"{prompt}\n\nText extracted from document:\n{text}\n\nReturn ONLY valid JSON, no markdown, no explanation."
 
     payload = {
         "model": MODEL,
@@ -36,22 +23,19 @@ def extract_from_text(text: str, prompt: str) -> dict:
     }
 
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=600)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=300)
         raw_text = response.json()["response"].strip()
 
-        import re
+        # Καθαρισμός markdown
         raw_text = re.sub(r'```json\s*', '', raw_text)
         raw_text = re.sub(r'```\s*', '', raw_text)
         raw_text = raw_text.strip()
 
-
-        # Try to find JSON in response
+        # Βρες το JSON μέσα στο text
         start = raw_text.find('{')
         end = raw_text.rfind('}') + 1
         if start >= 0 and end > start:
             raw_text = raw_text[start:end]
-
-        print("RAW:", raw_text[:300])
 
         return json.loads(raw_text)
 
@@ -59,7 +43,7 @@ def extract_from_text(text: str, prompt: str) -> dict:
         print("Δεν ήταν valid JSON")
         return {}
     except requests.exceptions.Timeout:
-        print("Timeout — moondream δεν είναι φορτωμένο!")
+        print("Timeout")
         return {}
     except Exception as e:
         print(f"Error: {e}")
@@ -68,20 +52,16 @@ def extract_from_text(text: str, prompt: str) -> dict:
 
 def extract_from_page(image_bytes: bytes, prompt: str) -> dict:
     """
-    Pipeline: εικόνα → OCR → clean → moondream → JSON
+    Pipeline: εικόνα → OCR preprocessing → VLM → JSON
     """
     from preprocessor import preprocess_for_llm
-    from extractor import merge_results
 
     print("  OCR + preprocessing...")
     preprocessed = preprocess_for_llm(image_bytes)
     text = preprocessed["clean_text"]
     print(f"  Κείμενο: {len(text)} chars, {preprocessed['total_chunks']} chunks")
-
-    # Στέλνουμε όλο το κείμενο (είναι ήδη μικρό από το chunking)
-    print("  Moondream extraction...")
-    result = extract_from_text(text, prompt)
-    return result
+    print("  VLM extraction...")
+    return extract_from_text(text, prompt)
 
 
 def extract_from_pdf(images: list, prompt: str) -> dict:
@@ -99,5 +79,17 @@ def check_ollama_connection() -> bool:
     try:
         response = requests.get(f"{OLLAMA_HOST}/api/tags", timeout=3)
         return response.status_code == 200
+    except:
+        return False
+
+
+def warmup_model():
+    """Φορτώνει το μοντέλο στη μνήμη."""
+    try:
+        print(f"Φόρτωση {MODEL}...")
+        payload = {"model": MODEL, "prompt": "hi", "stream": False}
+        requests.post(OLLAMA_URL, json=payload, timeout=300)
+        print("Μοντέλο έτοιμο!")
+        return True
     except:
         return False
