@@ -1,9 +1,9 @@
 {
-  "contract_number": null,
-  "contract_date": null,
+  "contract_number": "86",
+  "contract_date": "19.924",
   "notary": {
-    "name": null,
-    "address": null
+    "name": "Συνάθητο",
+    "address": "ΑΡΙΜΟΥΙΣΠΕΔΡΑΣΤΟΥ ΓΣΛΑΣΚΗΣΙΑ"
   },
   "sellers": [],
   "buyers": [],

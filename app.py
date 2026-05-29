@@ -2,6 +2,8 @@ import streamlit as st
 import json
 import time
 import pandas as pd
+import os
+import ollama_extractor
 from extractor import pdf_to_images, save_results
 from ollama_extractor import safe_extract_from_page, check_ollama_connection
 from evaluator import run_full_evaluation, format_evaluation_for_display
@@ -60,11 +62,10 @@ with tab1:
 
     ollama_ok = check_ollama_connection()
     if not ollama_ok:
-        st.warning("⚠️ VLM backend not reachable. Check OLLAMA_HOST settings.")
+        st.warning(f"⚠️ VLM backend not reachable at {ollama_extractor.OLLAMA_HOST}. Check OLLAMA_HOST settings.")
     else:
-        import os
-        model_name = os.environ.get('VLM_MODEL', 'moondream')
-        st.success(f"✅ VLM backend ready! (Model: {model_name})")
+        # Ενημερώνουμε δυναμικά το display name με βάση την επιλογή του χρήστη
+        st.success(f"✅ VLM backend ready! (Selected Model: {model_choice})")
 
     st.markdown("### Upload your document")
 
@@ -107,16 +108,17 @@ with tab1:
 
             selected_prompt = get_prompt_for_document_type(doc_type, prompt_choice)
 
-            # Set model from UI selection
-            import ollama_extractor
-            ollama_extractor.MODEL = model_choice
+            # Ρητός συγχρονισμός της μεταβλητής του module για ασφάλεια
+            ollama_extractor.DEFAULT_MODEL = model_choice
 
             from extractor import merge_results
 
             page_results = []
             for i, image_bytes in enumerate(images):
-                status.text(f"🤖 Processing page {i+1}/{total_pages}...")
-                result = safe_extract_from_page(image_bytes, selected_prompt)
+                status.text(f"🤖 Processing page {i+1}/{total_pages} using {model_choice}...")
+                
+                # Περνάμε ρητά την επιλογή του UI στη safe_extract_from_page
+                result = safe_extract_from_page(image_bytes, selected_prompt, model_name=model_choice)
                 page_results.append(result)
 
                 prog = 20 + int((i+1)/total_pages * 70)
