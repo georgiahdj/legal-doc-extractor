@@ -117,6 +117,7 @@ Tested fully locally inside the core Docker container (1 page per strategy) to b
   "representatives": [],
   "properties": []
 }
+```
 
 **Conclusions:**
 - **chain_of_thought** = best accuracy (most fields, best GT score)
