@@ -75,11 +75,21 @@ with tab1:
 
             images = pdf_to_images("temp.pdf")
             total_pages = len(images)
+            images = images[:max_pages]
+            total_pages = len(images)
 
             status.text(f"📄 Found {total_pages} pages")
             progress.progress(20)
 
             status.text("🤖 Extracting data with VLM...")
+
+            max_pages = st.slider(
+                "Max pages to process:",
+                min_value=1,
+                max_value=23,
+                value=3,
+                help="Limit pages for faster processing"
+            )
 
             selected_prompt = PROMPTS[prompt_choice]
 
