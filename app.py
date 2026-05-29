@@ -30,7 +30,7 @@ with st.sidebar:
     This tool extracts structured data from Greek property deeds using a
     Vision Language Model (VLM) running locally via Ollama.
     
-    **Model:** Moondream2  
+    **Model:** Qwen2.5-VL 3B  
     **Powered by:** Ollama + Streamlit  
     **Assessment for:** Synthetica AI
     """)
@@ -47,7 +47,7 @@ with tab1:
     if not ollama_ok:
         st.warning("⚠️ Ollama is starting up, please wait...")
     else:
-        st.success("✅ Ollama is running and ready!")
+        st.success("✅ Ollama is running and ready! (qwen2.5vl:3b)")
 
     st.markdown("### Upload your document")
 
@@ -74,8 +74,6 @@ with tab1:
                 f.write(pdf_bytes)
 
             images = pdf_to_images("temp.pdf")
-            total_pages = len(images)
-            images = images[:3]  # Test με τις πρώτες 3 σελίδες
             total_pages = len(images)
 
             status.text(f"📄 Found {total_pages} pages")
