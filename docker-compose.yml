@@ -25,7 +25,7 @@ services:
     entrypoint: >
       /bin/sh -c "
         sleep 5 &&
-        ollama pull qwen2.5vl:3b &&
+        ollama pull moondream &&
         echo 'Model ready!'
       "
     restart: "no"
@@ -39,6 +39,7 @@ services:
       - .:/app
     environment:
       - OLLAMA_HOST=http://ollama:11434
+      - VLM_MODEL=moondream
     depends_on:
       - ollama
     networks:
