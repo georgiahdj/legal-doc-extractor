@@ -1,0 +1,134 @@
+[
+  {
+    "prompt_name": "zero_shot",
+    "avg_time_per_page": 22.15,
+    "total_time": 66.44,
+    "fields_extracted": {
+      "contract_number": 1,
+      "contract_date": 1,
+      "notary_name": 1,
+      "notary_address": 1,
+      "sellers_count": 2,
+      "buyers_count": 2,
+      "representatives_count": 3,
+      "properties_count": 3,
+      "total_filled": 14
+    },
+    "json_validity_rate": 1.0,
+    "error_rate": 0.0,
+    "ground_truth_score": 1,
+    "ground_truth_details": {
+      "contract_number_correct": false,
+      "notary_correct": false,
+      "seller_correct": false,
+      "seller_afm_correct": false,
+      "property_type_correct": true,
+      "score": 1
+    },
+    "format_checks": [
+      {
+        "afm_format": false,
+        "date_format": true,
+        "contract_number_format": true
+      },
+      {
+        "afm_format": false,
+        "date_format": true,
+        "contract_number_format": true
+      },
+      {
+        "afm_format": false,
+        "date_format": false,
+        "contract_number_format": true
+      }
+    ]
+  },
+  {
+    "prompt_name": "chain_of_thought",
+    "avg_time_per_page": 22.76,
+    "total_time": 68.28,
+    "fields_extracted": {
+      "contract_number": 1,
+      "contract_date": 1,
+      "notary_name": 1,
+      "notary_address": 1,
+      "sellers_count": 4,
+      "buyers_count": 4,
+      "representatives_count": 3,
+      "properties_count": 3,
+      "total_filled": 18
+    },
+    "json_validity_rate": 1.0,
+    "error_rate": 0.0,
+    "ground_truth_score": 2,
+    "ground_truth_details": {
+      "contract_number_correct": false,
+      "notary_correct": false,
+      "seller_correct": false,
+      "seller_afm_correct": true,
+      "property_type_correct": true,
+      "score": 2
+    },
+    "format_checks": [
+      {
+        "afm_format": false,
+        "date_format": true,
+        "contract_number_format": true
+      },
+      {
+        "afm_format": false,
+        "date_format": true,
+        "contract_number_format": true
+      },
+      {
+        "afm_format": false,
+        "date_format": false,
+        "contract_number_format": true
+      }
+    ]
+  },
+  {
+    "prompt_name": "few_shot",
+    "avg_time_per_page": 16.77,
+    "total_time": 50.32,
+    "fields_extracted": {
+      "contract_number": 1,
+      "contract_date": 1,
+      "notary_name": 1,
+      "notary_address": 1,
+      "sellers_count": 1,
+      "buyers_count": 0,
+      "representatives_count": 0,
+      "properties_count": 0,
+      "total_filled": 5
+    },
+    "json_validity_rate": 1.0,
+    "error_rate": 0.0,
+    "ground_truth_score": 2,
+    "ground_truth_details": {
+      "contract_number_correct": true,
+      "notary_correct": false,
+      "seller_correct": false,
+      "seller_afm_correct": true,
+      "property_type_correct": false,
+      "score": 2
+    },
+    "format_checks": [
+      {
+        "afm_format": false,
+        "date_format": true,
+        "contract_number_format": true
+      },
+      {
+        "afm_format": false,
+        "date_format": false,
+        "contract_number_format": false
+      },
+      {
+        "afm_format": false,
+        "date_format": false,
+        "contract_number_format": false
+      }
+    ]
+  }
+]
