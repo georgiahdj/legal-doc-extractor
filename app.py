@@ -85,10 +85,18 @@ with tab1:
             images = images[:max_pages]
             total_pages = len(images)
 
-            status.text(f"📄 Processing {total_pages} pages...")
+            # Auto-detect document type
+            from preprocessor import extract_text_ocr
+            from document_types import detect_document_type, get_document_info, get_prompt_for_document_type
+            first_page_text = extract_text_ocr(images[0])
+            doc_type = detect_document_type(first_page_text)
+            doc_info = get_document_info(doc_type)
+
+            status.text(f"📄 Detected: {doc_info['name']} — Processing {total_pages} pages...")
+            st.info(f"📋 Document type detected: **{doc_info['name']}** — {doc_info['description']}")
             progress.progress(20)
 
-            selected_prompt = PROMPTS[prompt_choice]
+            selected_prompt = get_prompt_for_document_type(doc_type, prompt_choice)
 
             from extractor import merge_results
 
