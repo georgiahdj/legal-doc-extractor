@@ -1,0 +1,12 @@
+{
+  "contract_number": null,
+  "contract_date": null,
+  "notary": {
+    "name": null,
+    "address": null
+  },
+  "sellers": [],
+  "buyers": [],
+  "representatives": [],
+  "properties": []
+}

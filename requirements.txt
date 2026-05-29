@@ -1,0 +1,8 @@
+streamlit==1.40.0
+PyMuPDF
+python-dotenv
+pillow
+requests
+google-generativeai
+pandas
+pytesseract
