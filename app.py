@@ -89,7 +89,8 @@ with tab1:
             page_results = []
             for i, image_bytes in enumerate(images):
                 status.text(f"🤖 Processing page {i+1}/{total_pages}...")
-                result = extract_from_page(image_bytes, selected_prompt)
+                from ollama_extractor import safe_extract_from_page
+                result = safe_extract_from_page(image_bytes, selected_prompt)
                 page_results.append(result)
 
                 prog = 20 + int((i+1)/total_pages * 70)
