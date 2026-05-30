@@ -191,6 +191,26 @@ The document type is auto-detected from OCR text and a type-specific prompt is u
 
 ---
 
+## How We Measure Success (The 0-5 Scoring System)
+
+To evaluate how well our prompt strategies (Zero-Shot, Few-Shot, Chain of Thought) actually perform, we built an automated benchmarking system in `evaluator.py`. Instead of guessing if the AI output is correct, the code directly compares the extracted JSON against a verified human **Ground Truth** dataset from our sample contract.
+
+### The 5 Checkpoints
+Every extraction run gets a strict score from **0 to 5**. The model earns exactly **+1 point** for capturing each of these core legal fields inside the correct JSON key:
+
+* **Contract Number (+1)**: Checks if the model extracted `11.924` or `11924` without messing up the punctuation.
+* **Notary Name (+1)**: Verifies if the model correctly identified `ΜΑΡΙΑ ΜΑΣΟΥΡΟΥ-ΤΣΑΝΑΚΑ` as the notary.
+* **Seller Name (+1)**: Scans the extracted sellers list to make sure the primary seller, `ΑΘΑΝΑΣΙΟΣ ΑΛΜΠΑΝΗΣ`, was captured.
+* **Seller AFM (+1)**: Tests if the model extracted the exact 9-digit tax ID `94325270` without altering digits or hallucinating.
+* **Property Type (+1)**: Confirms if the model classified the asset correctly as an `οικόπεδο` (plot of land).
+
+### The Engineering Logic Behind It
+We didn't pick these 5 fields at random. They serve a clear technical purpose in our testing pipeline:
+1. **Data Diversity**: They force the VLM to handle different kinds of structures—alphanumeric strings, named entities, strict numbers, and domain classification.
+2. **The Merging Test**: These elements are scattered across different pages of the deed (from page 1 down to page 5). Achieving a perfect 5/5 score proves that our Text Chunking and `merge_results` layers are working seamlessly together without dropping data across multi-page files.
+3. **Legal & Business Value**: These specific fields represent the essential baseline for any real estate or legal tech application. If a system fails to reliably extract the core parties (seller/notary), the tax identifiers (AFM), or the property type, the automated audit is practically useless for real-world business compliance.
+  
+
 ## Setup & Run
 
 ### Option A — Docker (Recommended, CPU)
